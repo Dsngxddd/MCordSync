@@ -1,0 +1,4 @@
+name: MCordSync
+version: '${project.version}'
+main: com.pnternn.mcordsync.MCordSync
+api-version: '1.20'

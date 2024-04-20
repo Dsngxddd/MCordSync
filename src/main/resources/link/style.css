@@ -1,0 +1,181 @@
+body, html {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    gap: 0;
+    display: flex;
+    color: white;
+    user-select: none;
+    text-align: center;
+    flex-direction: row;
+    align-items: center;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    justify-content: center;
+    -webkit-user-select: none;
+    background-color: #202225;
+    transition: all 200ms ease-in-out;
+    transition: gap 400ms ease-in-out;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+span:first-child[hidden] {
+    opacity: 0;
+}
+
+span:last-child[hidden] {
+    opacity: 0;
+    transform: rotate(180deg);
+}
+
+img {
+    border-radius: 50%;
+    -webkit-user-drag: none;
+    outline: 1px solid beige;
+    border: 5px solid #5865F2;
+    box-shadow: 0 0 10px black;
+}
+
+div:last-child {
+    border-radius: 50%;
+}
+
+font {
+    height: 15px;
+    font-size: 115%;
+    line-height: 15px;
+    position: relative;
+    display: inline-block;
+    padding: 4px 5px 6px 5px;
+    background-size: auto 200%;
+    background-position: 0 -50%;
+    border: 1px dotted #5865f2;
+    background: linear-gradient(180deg, rgba(46,49,53,1) 0%, rgb(60,60,85) 50%, rgba(46,49,53,1) 100%);
+}
+
+font::before, font::after {
+    opacity: 0;
+    position: absolute;
+    pointer-events: none;
+    background-color: #18191C;
+    transition: opacity 50ms ease-in-out;
+}
+
+font::before {
+    width: auto;
+    left: -70px;
+    bottom: -60px;
+    color: white;
+    font-size: 80%;
+    min-width: 190px;
+    border-radius: 4px;
+    text-align: center;
+    content: attr(text);
+    padding: 15px 0 15px 0;
+}
+
+font::after {
+    left: 18px;
+    width: 10px;
+    content: '';
+    height: 10px;
+    bottom: -20px;
+    transform: rotate(45deg);
+}
+
+font[error] {
+    border: none;
+    display: flex;
+    background: none;
+    position: inherit;
+    position: relative;
+    align-items: flex-end;
+    flex-direction: column-reverse;
+}
+
+font[error]::before {
+    top: 0;
+    opacity: 1;
+    background: none;
+    color: #5b3c41;
+    position: relative;
+    content: attr(error);
+}
+
+font[error]::after {
+    display: none;
+}
+
+font:hover::before,
+font:hover::after {
+    opacity: 1;
+}
+
+span[waiting]::after {
+    content: '';
+    position: absolute;
+    animation: waiting 1.5s linear 0s infinite;
+}
+
+@keyframes waiting {
+    0%   { content: ''; }
+    25%   { content: '.'; }
+    50%  { content: '..'; }
+    75% { content: '...'; }
+}
+
+.minecraft::before, .discord::before {
+    left: 0;
+    width: 100%;
+    color: beige;
+    bottom: -25px;
+    position: absolute;
+    text-align: center;
+    content: attr(name);
+}
+
+.minecraft, .discord {
+    position: relative;
+    padding: 5px 0px 5px 0px;
+}
+
+p.success {
+    position: absolute;
+}
+
+div.separator {
+    width: 40px;
+    height: 260px;
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    align-content: center;
+    justify-content: center;
+}
+
+div.separator > div {
+    position: absolute;
+    width: max-content;
+    top: -50%;
+}
+
+div.separator > span {
+    color: #5865F2;
+}
+
+canvas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    pointer-events: none;
+}
+
+div {
+    z-index: 2;
+}
