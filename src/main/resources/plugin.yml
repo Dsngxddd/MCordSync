@@ -2,3 +2,6 @@ name: MCordSync
 version: '${project.version}'
 main: com.pnternn.mcordsync.MCordSync
 api-version: '1.20'
+commands:
+  discord:
+    description: Link your Discord account to your Minecraft account

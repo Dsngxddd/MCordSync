@@ -1,0 +1,16 @@
+bot:
+  id: "CLIENT_ID"
+  secret: "CLIENT_SECRET"
+  host: "127.0.0.1"
+  port: 800
+
+mysql:
+  host: "127.0.0.1"
+  port: 3306
+  database: "DatabaseName"
+  table: "mcordsync"
+  username: "root"
+  password: "password"
+
+
+
