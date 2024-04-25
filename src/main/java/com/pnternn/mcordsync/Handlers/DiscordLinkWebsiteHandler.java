@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import com.pnternn.mcordsync.MCordSync;
 import com.pnternn.mcordsync.Managers.DiscordLinkManager;
 import com.pnternn.mcordsync.Models.DiscordUserData;
+import com.pnternn.mcordsync.Config.ConfigurationHandler;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.bukkit.Bukkit;
@@ -46,7 +47,7 @@ public class DiscordLinkWebsiteHandler implements HttpHandler{
                 exchange.getResponseBody().write(response.toString().getBytes());
             }else if(state.equals("uri")){
                 JsonObject response = new JsonObject();
-                response.addProperty("uri", "https://discord.com/oauth2/authorize?client_id=1179755988316864542&response_type=code&scope=identify&redirect_uri=http://127.0.0.1:800/");
+                response.addProperty("uri", "https://discord.com/oauth2/authorize?client_id="+ ConfigurationHandler.getValue("bot.id") +"&response_type=code&scope=identify&redirect_uri=http://"+ConfigurationHandler.getValue("bot.host")+":"+ConfigurationHandler.getValue("bot.port")+"/");
                 exchange.sendResponseHeaders(200, 0);
                 exchange.getResponseBody().write(response.toString().getBytes());
             }else if(state.equals("discord_account")){
@@ -61,7 +62,7 @@ public class DiscordLinkWebsiteHandler implements HttpHandler{
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("POST");
                 con.setDoOutput(true);
-                String urlParameters = "client_id=1179755988316864542&client_secret=kFy3ULP2nqQv-1e7pGkxy1NfHqoMmPEl&grant_type=authorization_code&code=" + accessCode + "&redirect_uri=http://127.0.0.1:800/";
+                String urlParameters = "client_id="+ConfigurationHandler.getValue("bot.id")+"&client_secret="+ConfigurationHandler.getValue("bot.secret")+"&grant_type=authorization_code&code=" + accessCode + "&redirect_uri=http://"+ConfigurationHandler.getValue("bot.host")+":"+ConfigurationHandler.getValue("bot.port")+"/";
                 byte[] postData = urlParameters.getBytes(StandardCharsets.UTF_8);
                 try (OutputStream os = con.getOutputStream()) {
                     os.write(postData);
@@ -91,8 +92,9 @@ public class DiscordLinkWebsiteHandler implements HttpHandler{
                 String discordID = discordData.get("id").getAsString();
                 String username = discordData.get("global_name").getAsString();
                 String avatar = discordData.get("avatar").getAsString();
-                DiscordLinkManager.addUserDataWithMysql(new DiscordUserData(DiscordLinkManager.getUUID(code), discordID, username, avatar));
-
+                DiscordLinkManager.addUserData(new DiscordUserData(DiscordLinkManager.getUUID(code), discordID, username, avatar), true);
+                Bukkit.getPlayer(DiscordLinkManager.getUUID(code)).sendMessage("§3PirateSkyblock §7» §fDicord hesabınız bağlandı isminiz: §5" + username);
+                DiscordLinkManager.giveDiscordRoles(discordID);
             }else if(state.equals("retrieve_discord_account")){
                 if(DiscordLinkManager.getUUID(code) != null){
                     UUID playerUUID = DiscordLinkManager.getUUID(code);
@@ -126,7 +128,6 @@ public class DiscordLinkWebsiteHandler implements HttpHandler{
         }
         exchange.close();
     }
-
     private String determineContentType(String fileName) {
         if (fileName.endsWith(".html")) {
             return "text/html";

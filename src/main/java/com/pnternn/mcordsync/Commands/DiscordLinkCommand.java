@@ -2,23 +2,16 @@ package com.pnternn.mcordsync.Commands;
 
 import com.pnternn.mcordsync.MCordSync;
 import com.pnternn.mcordsync.Managers.DiscordLinkManager;
+import com.pnternn.mcordsync.Config.ConfigurationHandler;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
-
-import java.util.List;
 
 public class DiscordLinkCommand implements CommandExecutor {
     @Override
@@ -28,23 +21,24 @@ public class DiscordLinkCommand implements CommandExecutor {
             if(args.length >0){
                 if(args[0].equalsIgnoreCase("link")) {
                     if (DiscordLinkManager.getUserData(player.getUniqueId()) != null){
-                        player.sendMessage("Hesabınız zaten bağlı. Bağlantıyı kaldırmak için /discord unlink yazın");
+                        net.kyori.adventure.audience.Audience.class.cast(player).sendMessage(Component.text("§3PirateSkyblock §7» §fHesabın bağlı! Bağlantıyı kaldırmak için").append(Component.text(" tıkla").color(TextColor.color(87,100,241))).hoverEvent(HoverEvent.showText(Component.text("§5Discord Hesap bilgileri\n\n§7 Kullanıcı adı: §e" + DiscordLinkManager.getUserData(player.getUniqueId()).getUsername() + "\n"))).clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/discord unlink")));
                     }else{
                         String code = DiscordLinkManager.generateCode(player.getUniqueId());
                         player.sendMessage("");
-                        player.sendMessage(Component.text("Discord hesabınızı bağlamak için")
+                        net.kyori.adventure.audience.Audience.class.cast(player).sendMessage(Component.text("§3PirateSkyblock §7» §fDiscord hesabınızı bağlamak için")
                                 .append(Component.text(" tıkla").color(TextColor.color(87,100,241)))
                                 .hoverEvent(HoverEvent.showText(Component.text("Discord hesabınızı bağlamak için tıklayın")))
-                                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "http://127.0.0.1:800/?id=" + code)));
+                                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "http://"+ ConfigurationHandler.getValue("bot.host") +":"+ConfigurationHandler.getValue("bot.port")+"/?id=" + code)));
                         player.sendMessage("");
                     }
                 }if(args[0].equalsIgnoreCase("unlink")){
                     if(DiscordLinkManager.getUserData(player.getUniqueId()) == null){
-                        player.sendMessage("Hesabınız zaten bağlı değil. Bağlamak için /discord link yazın");
+                        net.kyori.adventure.audience.Audience.class.cast(player).sendMessage(Component.text("§3PirateSkyblock §7» §fHesabın bağlı değil! Bağlamak için").append(Component.text(" tıkla").color(TextColor.color(87,100,241)).clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/discord link"))).hoverEvent(HoverEvent.showText(Component.text("Discord hesabınızı bağlamak için tıklayın"))));
                     }else{
+                        DiscordLinkManager.takeDiscordRoles(DiscordLinkManager.getDiscordID(player.getUniqueId()));
                         DiscordLinkManager.removeUserData(player.getUniqueId());
                         MCordSync.getInstance().getMySQL().deleteUser(player.getUniqueId().toString());
-                        player.sendMessage("Bağlantı başarıyla kaldırıldı");
+                        player.sendMessage("§3PirateSkyblock §7» §fBağlantı başarıyla kaldırıldı");
                     }
                 }
             }

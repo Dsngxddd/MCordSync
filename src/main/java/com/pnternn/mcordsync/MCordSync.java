@@ -2,11 +2,19 @@ package com.pnternn.mcordsync;
 
 import com.pnternn.mcordsync.Commands.DiscordLinkCommand;
 import com.pnternn.mcordsync.Handlers.DiscordLinkWebsiteHandler;
+import com.pnternn.mcordsync.Listeners.DiscordBotListener;
 import com.pnternn.mcordsync.Managers.DiscordLinkManager;
 import com.pnternn.mcordsync.Models.DiscordUserData;
-import com.pnternn.mcordsync.config.ConfigurationHandler;
-import com.pnternn.mcordsync.sql.MySQL;
+import com.pnternn.mcordsync.Config.ConfigurationHandler;
+import com.pnternn.mcordsync.SQL.MySQL;
 import com.sun.net.httpserver.HttpServer;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,6 +26,7 @@ import java.util.concurrent.Executors;
 public final class MCordSync extends JavaPlugin {
     private static MCordSync instance;
     private MySQL mySql;
+    private static JDA jda;
     private final ConfigurationHandler configurationHandler = new ConfigurationHandler();
     HttpServer server;
     @Override
@@ -25,12 +34,31 @@ public final class MCordSync extends JavaPlugin {
         instance = this;
         configurationHandler.init();
 
-
         setupServer();
         setupMySQL();
+        setupDiscordBot();
 
         this.getCommand("discord").setExecutor(new DiscordLinkCommand());
     }
+
+
+    private void setupDiscordBot(){
+        jda = JDABuilder.createDefault(ConfigurationHandler.getValue("bot.token"))
+                .setActivity(Activity.playing(":sunglasses: Hayatınla"))
+                .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES)
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                .setChunkingFilter(ChunkingFilter.ALL)
+                .enableCache(CacheFlag.ONLINE_STATUS, CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS)
+                .build();
+
+        try {
+            jda.awaitReady();
+        } catch (InterruptedException e) {
+            Bukkit.getLogger().severe("Discord bot could not start");
+        }
+        jda.addEventListener(new DiscordBotListener());
+    }
+
     private void setupMySQL(){
         String host = ConfigurationHandler.getValue("mysql.host");
         String port = ConfigurationHandler.getValue("mysql.port");
@@ -40,7 +68,7 @@ public final class MCordSync extends JavaPlugin {
         mySql = new MySQL(host, port, database, username, password);
         mySql.createTable();
         for(DiscordUserData user : mySql.getUsers()){
-            DiscordLinkManager.addUserData(user);
+            DiscordLinkManager.addUserData(user, false);
         }
     }
     private void setupServer(){
@@ -60,9 +88,13 @@ public final class MCordSync extends JavaPlugin {
     @Override
     public void onDisable() {
         server.stop(0);
+        jda.shutdownNow();
     }
     public static MCordSync getInstance(){
         return instance;
+    }
+    public static JDA getJDA(){
+        return jda;
     }
     public MySQL getMySQL(){
         return mySql;

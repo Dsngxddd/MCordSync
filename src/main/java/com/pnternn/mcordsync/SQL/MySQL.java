@@ -1,10 +1,8 @@
-package com.pnternn.mcordsync.sql;
+package com.pnternn.mcordsync.SQL;
 
 import com.pnternn.mcordsync.Models.DiscordUserData;
-import com.pnternn.mcordsync.config.ConfigurationHandler;
+import com.pnternn.mcordsync.Config.ConfigurationHandler;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.event.Listener;
 
 import java.sql.*;
 import java.util.ArrayList;

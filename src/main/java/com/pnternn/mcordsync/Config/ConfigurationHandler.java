@@ -1,8 +1,6 @@
-package com.pnternn.mcordsync.config;
+package com.pnternn.mcordsync.Config;
 
 import com.pnternn.mcordsync.MCordSync;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 

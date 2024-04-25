@@ -1,8 +1,17 @@
 bot:
   id: "CLIENT_ID"
+  token: "BOT_TOKEN"
   secret: "CLIENT_SECRET"
   host: "127.0.0.1"
-  port: 800
+  port: 80
+
+guild:
+  id: "GUILD_ID"
+
+roles:
+  0:
+    id: "ROLE_ID"
+    permission: "mcordsync.role.0"
 
 mysql:
   host: "127.0.0.1"
