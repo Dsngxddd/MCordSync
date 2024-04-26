@@ -8,6 +8,8 @@ import com.pnternn.mcordsync.Models.DiscordUserData;
 import com.pnternn.mcordsync.Config.ConfigurationHandler;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 
 import java.io.*;
@@ -93,7 +95,8 @@ public class DiscordLinkWebsiteHandler implements HttpHandler{
                 String username = discordData.get("global_name").getAsString();
                 String avatar = discordData.get("avatar").getAsString();
                 DiscordLinkManager.addUserData(new DiscordUserData(DiscordLinkManager.getUUID(code), discordID, username, avatar), true);
-                Bukkit.getPlayer(DiscordLinkManager.getUUID(code)).sendMessage("§3PirateSkyblock §7» §fDicord hesabınız bağlandı isminiz: §5" + username);
+                MiniMessage mm = MiniMessage.miniMessage();
+                net.kyori.adventure.audience.Audience.class.cast(Bukkit.getPlayer(DiscordLinkManager.getUUID(code))).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.successfullySync"), Placeholder.parsed("username", username)));
                 DiscordLinkManager.giveDiscordRoles(discordID);
             }else if(state.equals("retrieve_discord_account")){
                 if(DiscordLinkManager.getUUID(code) != null){

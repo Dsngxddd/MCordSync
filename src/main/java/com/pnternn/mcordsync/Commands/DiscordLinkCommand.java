@@ -7,6 +7,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.minimessage.Context;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,38 +23,47 @@ import org.jetbrains.annotations.NotNull;
 public class DiscordLinkCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+        MiniMessage mm = MiniMessage.miniMessage();
         if(sender instanceof Player){
             Player player = (Player) sender;
             if(args.length >0){
-                if(args[0].equalsIgnoreCase("link")) {
-                    if (DiscordLinkManager.getUserData(player.getUniqueId()) != null){
-                        net.kyori.adventure.audience.Audience.class.cast(player).sendMessage(Component.text("§3PirateSkyblock §7» §fHesabın bağlı! Bağlantıyı kaldırmak için").append(Component.text(" tıkla").color(TextColor.color(87,100,241))).hoverEvent(HoverEvent.showText(Component.text("§5Discord Hesap bilgileri\n\n§7 Kullanıcı adı: §e" + DiscordLinkManager.getUserData(player.getUniqueId()).getUsername() + "\n"))).clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/discord unlink")));
-                    }else{
-                        String code = DiscordLinkManager.generateCode(player.getUniqueId());
-                        player.sendMessage("");
-                        net.kyori.adventure.audience.Audience.class.cast(player).sendMessage(Component.text("§3PirateSkyblock §7» §fDiscord hesabınızı bağlamak için")
-                                .append(Component.text(" tıkla").color(TextColor.color(87,100,241)))
-                                .hoverEvent(HoverEvent.showText(Component.text("Discord hesabınızı bağlamak için tıklayın")))
-                                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "http://"+ ConfigurationHandler.getValue("bot.host") +":"+ConfigurationHandler.getValue("bot.port")+"/?id=" + code)));
-                        player.sendMessage("");
+                if(player.hasPermission("mcordsync.player")){
+                    if(args[0].equalsIgnoreCase("link")) {
+
+                        if (DiscordLinkManager.getUserData(player.getUniqueId()) != null){
+                            player.sendMessage("");
+                            net.kyori.adventure.audience.Audience.class.cast(player).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.alreadySynced")));
+                            player.sendMessage("");
+                        }else{
+                            String code = DiscordLinkManager.generateCode(player.getUniqueId());
+                            player.sendMessage("");
+                            net.kyori.adventure.audience.Audience.class.cast(player).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.syncMessage"), Placeholder.styling("link", ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "http://"+ConfigurationHandler.getValue("bot.host")+":"+ConfigurationHandler.getValue("bot.port")+"/?id=" + code))));
+                            player.sendMessage("");
+                        }
+                    }if(args[0].equalsIgnoreCase("unlink")){
+                        if(DiscordLinkManager.getUserData(player.getUniqueId()) == null){
+                            player.sendMessage("");
+                            net.kyori.adventure.audience.Audience.class.cast(player).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.alreadyUnsynced")));
+                            player.sendMessage("");
+                        }else{
+                            DiscordLinkManager.takeDiscordRoles(DiscordLinkManager.getDiscordID(player.getUniqueId()));
+                            DiscordLinkManager.removeUserData(player.getUniqueId());
+                            MCordSync.getInstance().getMySQL().deleteUser(player.getUniqueId().toString());
+                            player.sendMessage("");
+                            net.kyori.adventure.audience.Audience.class.cast(player).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.successfullyUnsync")));
+                            player.sendMessage("");
+                        }
                     }
-                }if(args[0].equalsIgnoreCase("unlink")){
-                    if(DiscordLinkManager.getUserData(player.getUniqueId()) == null){
-                        net.kyori.adventure.audience.Audience.class.cast(player).sendMessage(Component.text("§3PirateSkyblock §7» §fHesabın bağlı değil! Bağlamak için").append(Component.text(" tıkla").color(TextColor.color(87,100,241)).clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/discord link"))).hoverEvent(HoverEvent.showText(Component.text("Discord hesabınızı bağlamak için tıklayın"))));
-                    }else{
-                        DiscordLinkManager.takeDiscordRoles(DiscordLinkManager.getDiscordID(player.getUniqueId()));
-                        DiscordLinkManager.removeUserData(player.getUniqueId());
-                        MCordSync.getInstance().getMySQL().deleteUser(player.getUniqueId().toString());
-                        player.sendMessage("§3PirateSkyblock §7» §fBağlantı başarıyla kaldırıldı");
-                    }
+                }else{
+                    player.sendMessage("");
+                    net.kyori.adventure.audience.Audience.class.cast(player).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.noPermission")));
+                    player.sendMessage("");
+
                 }
             }
-
-
-
             return true;
         }else{
-            sender.sendMessage("You must be a player to use this command");
+            net.kyori.adventure.audience.Audience.class.cast(sender).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.noConsole")));
         }
         return false;
     }

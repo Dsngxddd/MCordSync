@@ -21,5 +21,14 @@ mysql:
   username: "root"
   password: "password"
 
+messages:
+  noPermission: "<color:#DD5746>You do not have permission to execute this command."
+  noConsole: "<color:#DD5746>This command can only be executed by players."
+  successfullySync: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Discord hesabınız bağlandı isminiz: <color:#5764F1><username>"
+  successfullyUnsync: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>link removed successfully"
+  alreadySynced: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Hesabın bağlı! Bağlantıyı kaldırmak için <color:#5764F1><click:run_command:/discord unlink>tıkla"
+  alreadyUnsynced: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Hesabın bağlı değil! Bağlamak için <color:#5764F1><click:run_command:/discord link>tıkla"
+  syncMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Discord hesabınızı bağlamak için <color:#5764F1><link>tıkla"
+
 
 
