@@ -18,10 +18,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class DiscordLinkManager {
+public class DiscordUserManager {
     private final static HashMap<UUID, String> codes = new HashMap<>();
     private static final List<DiscordUserData> userData = new ArrayList<>();
-    public DiscordLinkManager() {
+    public DiscordUserManager() {
         super();
     }
 
@@ -29,9 +29,6 @@ public class DiscordLinkManager {
         String code = RandomStringUtils.randomAlphanumeric(16);
         codes.put(playerUUID, code);
         return code;
-    }
-    public static String getCode(UUID uuid){
-        return codes.get(uuid);
     }
     public static void removeCode(String code){
         codes.remove(getUUID(code));

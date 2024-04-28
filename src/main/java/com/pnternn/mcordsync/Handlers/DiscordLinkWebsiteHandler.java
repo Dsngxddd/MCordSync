@@ -3,7 +3,9 @@ package com.pnternn.mcordsync.Handlers;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.pnternn.mcordsync.MCordSync;
-import com.pnternn.mcordsync.Managers.DiscordLinkManager;
+import com.pnternn.mcordsync.Managers.DiscordReportManager;
+import com.pnternn.mcordsync.Managers.DiscordUserManager;
+import com.pnternn.mcordsync.Models.DiscordReportData;
 import com.pnternn.mcordsync.Models.DiscordUserData;
 import com.pnternn.mcordsync.Config.ConfigurationHandler;
 import com.sun.net.httpserver.HttpExchange;
@@ -16,7 +18,10 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
+import java.util.TreeMap;
 import java.util.UUID;
 
 public class DiscordLinkWebsiteHandler implements HttpHandler{
@@ -35,14 +40,14 @@ public class DiscordLinkWebsiteHandler implements HttpHandler{
             }
             String state = json.get("get").getAsString();
             if(state.equals("uuid")){
-                if(DiscordLinkManager.getUUID(code) == null){
+                if(DiscordUserManager.getUUID(code) == null){
                     JsonObject response = new JsonObject();
                     response.addProperty("success", "false");
                     exchange.sendResponseHeaders(200, 0);
                     exchange.getResponseBody().write(response.toString().getBytes());
                     return;
                 }
-                UUID uuid = DiscordLinkManager.getUUID(code);
+                UUID uuid = DiscordUserManager.getUUID(code);
                 JsonObject response = new JsonObject();
                 response.addProperty("uuid", uuid.toString());
                 exchange.sendResponseHeaders(200, 0);
@@ -94,33 +99,68 @@ public class DiscordLinkWebsiteHandler implements HttpHandler{
                 String discordID = discordData.get("id").getAsString();
                 String username = discordData.get("global_name").getAsString();
                 String avatar = discordData.get("avatar").getAsString();
-                DiscordLinkManager.addUserData(new DiscordUserData(DiscordLinkManager.getUUID(code), discordID, username, avatar), true);
+                DiscordUserManager.addUserData(new DiscordUserData(DiscordUserManager.getUUID(code), discordID, username, avatar), true);
                 MiniMessage mm = MiniMessage.miniMessage();
-                net.kyori.adventure.audience.Audience.class.cast(Bukkit.getPlayer(DiscordLinkManager.getUUID(code))).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.successfullySync"), Placeholder.parsed("username", username)));
-                DiscordLinkManager.giveDiscordRoles(discordID);
+                ((net.kyori.adventure.audience.Audience) Bukkit.getPlayer(DiscordUserManager.getUUID(code))).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.successfullySync"), Placeholder.parsed("username", username)));
+                DiscordUserManager.giveDiscordRoles(discordID);
             }else if(state.equals("retrieve_discord_account")){
-                if(DiscordLinkManager.getUUID(code) != null){
-                    UUID playerUUID = DiscordLinkManager.getUUID(code);
+                if(DiscordUserManager.getUUID(code) != null){
+                    UUID playerUUID = DiscordUserManager.getUUID(code);
                     JsonObject response = new JsonObject();
                     response.addProperty("name", Bukkit.getPlayer(playerUUID).getName());
-                    response.addProperty("id",  DiscordLinkManager.getUserData(playerUUID).getDiscordID());
-                    response.addProperty("avatar", DiscordLinkManager.getUserData(playerUUID).getAvatar());
-                    response.addProperty("username", DiscordLinkManager.getUserData(playerUUID).getUsername());
+                    response.addProperty("id",  DiscordUserManager.getUserData(playerUUID).getDiscordID());
+                    response.addProperty("avatar", DiscordUserManager.getUserData(playerUUID).getAvatar());
+                    response.addProperty("username", DiscordUserManager.getUserData(playerUUID).getUsername());
                     exchange.sendResponseHeaders(200, 0);
                     exchange.getResponseBody().write(response.toString().getBytes());
-                    DiscordLinkManager.removeCode(code);
+                    DiscordUserManager.removeCode(code);
                 }else{
                     JsonObject response = new JsonObject();
                     response.addProperty("success", "false");
                     exchange.sendResponseHeaders(200, 0);
                     exchange.getResponseBody().write(response.toString().getBytes());
                 }
-                DiscordLinkManager.removeCode(code);
+                DiscordUserManager.removeCode(code);
             }
         }else if (dataMethod.equals("GET")) {
             String url = exchange.getRequestURI().getPath();
             if(url.equals("/")){
                 url = "/index.html";
+            }else if(url.contains("/report/")){
+                String[] data = url.split("/");
+                if(data.length == 3){
+                    String id = data[2];
+                    DiscordReportData report = DiscordReportManager.getReport(Integer.parseInt(id));
+                    if(report == null){
+                        exchange.sendResponseHeaders(404, 0);
+                        exchange.getResponseBody().write("404 Not Found".getBytes());
+                        return;
+                    }
+                    exchange.getResponseHeaders().set("Content-Type", "text/html");
+                    File tempFile = File.createTempFile("report-"+id, ".txt");
+                    FileWriter writer = new FileWriter(tempFile);
+                    writer.write("Rapor ID: "+report.getReportID()+"\n");
+                    writer.write("Raporlayan: "+Bukkit.getOfflinePlayer(report.getReporterUUID()).getName()+"\n");
+                    writer.write("Raporlanan: "+Bukkit.getOfflinePlayer(report.getReportedUUID()).getName()+"\n");
+                    writer.write("Sebep: "+report.getReason()+"\n");
+                    writer.write("Sunucu: "+report.getServer()+"\n");
+                    writer.write("Durum: "+report.getStatus()+"\n");
+                    writer.write("Tarih: "+report.getDate().toString()+"\n");
+                    writer.write("Son 20 saniyedeki makro Oranı: "+report.getCps()+"\n");
+                    writer.write("Mesajlar:"+"\n");
+                    for(LocalDateTime date: report.getMessages().keySet()){
+                        writer.write(date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))+" = "+report.getMessages().get(date)+"\n");
+                    }
+                    writer.close();
+                    exchange.getResponseHeaders().set("Content-Disposition", "attachment; filename=report-"+id+".txt");
+                    exchange.sendResponseHeaders(200, 0);
+                    OutputStream responseBody = exchange.getResponseBody();
+                    FileInputStream file = new FileInputStream(tempFile);
+                    responseBody.write(file.readAllBytes());
+                    tempFile.deleteOnExit();
+                    responseBody.close();
+                    return;
+                }
             }
             exchange.getResponseHeaders().set("Content-Type", determineContentType(url));
             FileInputStream file = new FileInputStream(MCordSync.getInstance().getDataFolder().getAbsolutePath() + "/website" + url);

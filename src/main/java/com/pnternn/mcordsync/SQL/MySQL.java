@@ -1,13 +1,16 @@
 package com.pnternn.mcordsync.SQL;
 
+import com.pnternn.mcordsync.Models.DiscordReportData;
 import com.pnternn.mcordsync.Models.DiscordUserData;
 import com.pnternn.mcordsync.Config.ConfigurationHandler;
+import com.pnternn.mcordsync.Models.PlayerData;
 import org.bukkit.Bukkit;
+import org.bukkit.material.Tree;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class MySQL {
     private Connection connection;
@@ -24,9 +27,35 @@ public class MySQL {
         try {
             Statement statement = connection.createStatement();
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS "+ ConfigurationHandler.getValue("mysql.table") +" (uuid VARCHAR(255), discordID VARCHAR(255), username VARCHAR(255), avatar VARCHAR(255))");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS "+ ConfigurationHandler.getValue("mysql.table") + "_reports" +" (reportID INT, reporterUUID VARCHAR(255), reportedUUID VARCHAR(255), reason VARCHAR(255), date VARCHAR(255), status VARCHAR(255), server VARCHAR(255), messages TEXT, cps DOUBLE)");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS "+ ConfigurationHandler.getValue("mysql.table") + "_players" +" (uuid VARCHAR(255), warns INT, muteExpire VARCHAR(255))");
             statement.close();
         } catch (SQLException e) {
             Bukkit.getLogger().severe("Could not create table: " + e.getMessage());
+        }
+    }
+    public void createPlayer(UUID uuid){
+        try {
+            Statement statement = connection.createStatement();
+            statement.executeUpdate("INSERT INTO "+ ConfigurationHandler.getValue("mysql.table") + "_players" +" (uuid, warns, muteExpire) VALUES ('" + uuid + "', '0', '0')");
+            statement.close();
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("Could not create player: " + e.getMessage());
+        }
+    }
+
+    public void createReport(DiscordReportData reportData){
+        try {
+            TreeMap<LocalDateTime, String> messages = reportData.getMessages();
+            StringBuilder messageString = new StringBuilder();
+            for(LocalDateTime date: messages.keySet()){
+                messageString.append(date.toString()).append("=").append(messages.get(date)).append(",");
+            }
+            Statement statement = connection.createStatement();
+            statement.executeUpdate("INSERT INTO "+ ConfigurationHandler.getValue("mysql.table") + "_reports" +" (reportID, reporterUUID, reportedUUID, reason, date, status, server, messages, cps) VALUES ('" + reportData.getReportID() + "', '" + reportData.getReporterUUID() + "', '" + reportData.getReportedUUID() + "', '" + reportData.getReason() + "', '" + reportData.getDate() + "', '" + reportData.getStatus() + "', '" + reportData.getServer() + "', '" + messageString + "', '" + reportData.getCps() + "')");
+            statement.close();
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("Could not create report: " + e.getMessage());
         }
     }
 
@@ -39,13 +68,13 @@ public class MySQL {
             Bukkit.getLogger().severe("Could not create crew: " + e.getMessage());
         }
     }
-    public void createUser(String uuid, String discordID, String username, String avatar) {
+    public void deleteReport(int reportID) {
         try {
             Statement statement = connection.createStatement();
-            statement.executeUpdate("INSERT INTO "+ ConfigurationHandler.getValue("mysql.table") +" (uuid, discordID, username, avatar) VALUES ('" + uuid + "', '" + discordID + "', '" + username + ", " + avatar + "')");
+            statement.executeUpdate("DELETE FROM "+ ConfigurationHandler.getValue("mysql.table") + "_reports" +" WHERE reportID='" + reportID + "'");
             statement.close();
         } catch (SQLException e) {
-            Bukkit.getLogger().severe("Could not create user: " + e.getMessage());
+            Bukkit.getLogger().severe("Could not delete report: " + e.getMessage());
         }
     }
     public void deleteUser(String uuid) {
@@ -70,6 +99,70 @@ public class MySQL {
             Bukkit.getLogger().severe("Could not get users: " + e.getMessage());
         }
         return users;
+    }
+    public void mutePlayer(UUID uuid, LocalDateTime time){
+        try {
+            Statement statement = connection.createStatement();
+            if(time == null){
+                statement.executeUpdate("UPDATE "+ ConfigurationHandler.getValue("mysql.table") + "_players" +" SET muteExpire='0' WHERE uuid='" + uuid + "'");
+            }else{
+                statement.executeUpdate("UPDATE "+ ConfigurationHandler.getValue("mysql.table") + "_players" +" SET muteExpire='"+ time +"' WHERE uuid='" + uuid + "'");
+            }
+            statement.close();
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("Could not mute player: " + e.getMessage());
+        }
+    }
+    public List<PlayerData> getPlayers(){
+        List<PlayerData> players = new ArrayList<>();
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM "+ ConfigurationHandler.getValue("mysql.table") + "_players");
+            while (resultSet.next()) {
+                LocalDateTime muteExpire = null;
+                if(!Objects.equals(resultSet.getString("muteExpire"), "0")) {
+                    muteExpire = LocalDateTime.parse(resultSet.getString("muteExpire"));
+                }
+                players.add(new PlayerData(UUID.fromString(resultSet.getString("uuid")), muteExpire, resultSet.getInt("warns")));
+            }
+            statement.close();
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("Could not get players: " + e.getMessage());
+        }
+        return players;
+    }
+
+    public List<DiscordReportData> getReports(){
+        List<DiscordReportData> reports = new ArrayList<>();
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM "+ ConfigurationHandler.getValue("mysql.table") + "_reports");
+            while (resultSet.next()) {
+                String[] messages = resultSet.getString("messages").split(",");
+                TreeMap<LocalDateTime, String> messageMap = new TreeMap<>();
+                for(String message: messages){
+                    String[] messageData = message.split("=");
+                    if(messageData.length == 2){
+                        messageMap.put(LocalDateTime.parse(messageData[0]), messageData[1]);
+                    }
+                }
+                reports.add(new DiscordReportData(resultSet.getInt("reportID"), UUID.fromString(resultSet.getString("reporterUUID")), UUID.fromString(resultSet.getString("reportedUUID")), resultSet.getString("reason"), resultSet.getString("date"), resultSet.getString("status"), resultSet.getString("server"), messageMap, resultSet.getDouble("cps")));
+            }
+            statement.close();
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("Could not get reports: " + e.getMessage());
+        }
+        return reports;
+    }
+
+    public void setStateReport(int reportID, String status) {
+        try {
+            Statement statement = connection.createStatement();
+            statement.executeUpdate("UPDATE "+ ConfigurationHandler.getValue("mysql.table") + "_reports" +" SET status='"+ status+"' WHERE reportID='" + reportID + "'");
+            statement.close();
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("Could not close report: " + e.getMessage());
+        }
     }
 
 }
