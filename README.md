@@ -1,39 +1,39 @@
-# Minecraft Discord Hesap Eşleme Sistemi
+# Minecraft Discord Account Linking System
 
-Bu proje, Minecraft oyuncularının Discord hesaplarını Minecraft hesaplarıyla eşlemelerine olanak tanıyan bir sistemdir. Bu sayede sunucunuzdaki oyuncuların Discord hesaplarını kolayca takip edebilir ve çeşitli entegre hizmetlerden yararlanabilirsiniz.
+This project allows Minecraft players to link their Discord accounts with their Minecraft accounts. This way, you can easily track the Discord accounts of players on your server and benefit from various integrated services.
 
-## Özellikler
+## Features
 
-- **Kolay Kurulum**: Hızlı ve basit kurulum adımları sayesinde kolayca kurulum yapabilirsiniz.
-- **Güvenli Eşleme**: Oyuncuların Discord hesaplarını güvenli bir şekilde Minecraft hesaplarıyla eşleyerek güvenliği artırın.
-- **Rol Eşleme Sistemi**: Oyuncuların Discord rollerini Minecraft'taki gruplarla eşleyin, böylece sunucunuzdaki yetkileri ve izinleri senkronize edin.
-- **Özelleştirilebilir**: Tüm mesajları ve ayarları ihtiyaçlarınıza göre özelleştirin. Bu, sunucunuzun temasına ve gereksinimlerine uygun şekilde yapılandırma yapmanıza olanak tanır.
-- **Hub Sunucu Desteği**: Redis ve SQL desteği sayesinde birden fazla sunucuda çalışabilir ve merkezi bir veri tabanına bağlanarak tüm sunucularda tutarlı eşleme sağlar.
+- **Easy Setup**: Quick and simple installation steps allow for easy setup.
+- **Secure Linking**: Enhance security by securely linking players' Discord accounts with their Minecraft accounts.
+- **Role Linking System**: Link players' Discord roles with groups in Minecraft, synchronizing permissions and authorities on your server.
+- **Customizable**: Customize all messages and settings according to your needs, allowing you to configure them to match your server's theme and requirements.
+- **Hub Server Support**: With Redis and SQL support, it can operate on multiple servers and connect to a central database, ensuring consistent linking across all servers.
 
-## Kurulum
+## Installation
 
-Aşağıdaki adımları izleyerek sistemi kurabilirsiniz:
+Follow the steps below to set up the system:
 
-### 1. Adım: Discord Botu Oluşturma
+### Step 1: Creating a Discord Bot
 
-1. [Discord Developer Portal](https://discord.com/developers/applications)'a gidin ve yeni bir bot oluşturun.
-2. Botun `Token`, `Client ID` ve `Client Secret` bilgilerini not alın.
-3. Botunuzun OAuth2 ayarlarında bir Redirect URL ekleyin. Bu URL, botunuzun kullanıcıları geri yönlendireceği sayfadır ve şu formatta olmalıdır: `http://yourdomain.com/callback`.
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications) and create a new bot.
+2. Note down the `Token`, `Client ID`, and `Client Secret` of the bot.
+3. Add a Redirect URL in the OAuth2 settings of your bot. This URL is where your bot will redirect users and should be in the following format: `http://IP_or_Domain:port` for example: `http://127.0.0.1:80`
 
-### 2. Adım: Plugin'i İndirme ve Yükleme
+### Step 2: Downloading and Installing the Plugin
 
-1. GitHub reposundan plugin dosyasını indirin:
+1. Download the plugin files from the GitHub repository:
    ```bash
-   git clone https://github.com/kullaniciAdin/minecraft-discord-hesap-esleme.git
-   cd minecraft-discord-hesap-esleme
-2. Plugin dosyasını Minecraft sunucunuzun plugins klasörüne taşıyın.
+   git clone https://github.com/yourusername/minecraft-discord-account-linking.git
+   cd minecraft-discord-account-linking
+2. Move the plugin files to the plugins folder of your Minecraft server.
 
-### 3. Adım: config.yml Dosyasını Yapılandırma
-config.yml dosyasını açın ve aşağıdaki gibi yapılandırın:
+### Step 3: Configuring the config.yml File
+Open the config.yml file and configure it as follows:
 
 ```yaml
 bot:
-  enabled: true #Only main server should have this enabled
+  enabled: true #Only the main server should have this enabled
   id: "CLIENT_ID"
   token: "BOT_TOKEN"
   secret: "CLIENT_SECRET"
@@ -56,6 +56,7 @@ redis:
   port: 6379
   channel: "mcordsync"
   password: ""
+
 mysql:
   enabled: true
   host: "127.0.0.1"
@@ -70,27 +71,26 @@ sqlite: #Work In Progress
   database: "DatabaseName"
   table: "mcordsync"
 
-
 messages: #FORMATS https://docs.advntr.dev/minimessage/format.html
-  playerMuted: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Sen susturuldun, susturulma bitmesine kalan süre: <color:#5764F1><time>"
+  playerMuted: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>You have been muted, remaining mute time: <color:#5764F1><time>"
   noPermission: "<color:#DD5746>You do not have permission to execute this command."
   noConsole: "<color:#DD5746>This command can only be executed by players."
-  successfullySync: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Discord hesabınız bağlandı isminiz: <color:#5764F1><username>"
-  successfullyUnsync: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>link removed successfully"
-  alreadySynced: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Hesabın bağlı! Bağlantıyı kaldırmak için <color:#5764F1><click:run_command:/discord-esle kaldir>tıkla"
-  alreadyUnsynced: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Hesabın bağlı değil! Bağlamak için <color:#5764F1><click:run_command:/discord-esle bagla>tıkla"
-  syncMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Discord hesabınızı bağlamak için <color:#5764F1><link>tıkla"
-  reporterPlayerMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Başarıyla raporlandı, rapora bakmak için <color:#5764F1><link>tıkla"
-  reportedPlayerMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Bir oyuncu seni raporladı, raporun detayları için <color:#5764F1><link>tıkla"
-  reportChangeStatusMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Raporun durumu değiştirildi, raporun detayları için <color:#5764F1><link>tıkla"
+  successfullySync: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Your Discord account has been linked, username: <color:#5764F1><username>"
+  successfullyUnsync: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Link removed successfully"
+  alreadySynced: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Your account is already linked! To unlink, click <color:#5764F1><click:run_command:/discord-unlink>here</click>"
+  alreadyUnsynced: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Your account is not linked! To link, click <color:#5764F1><click:run_command:/discord-link>here</click>"
+  syncMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>To link your Discord account, click <color:#5764F1><link>here"
+  reporterPlayerMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Reported successfully, click <color:#5764F1><link>here to view the report"
+  reportedPlayerMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>You have been reported by a player, click <color:#5764F1><link>here to view the details"
+  reportChangeStatusMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>The status of your report has been changed, click <color:#5764F1><link>here to view the details"
 ```
-### 4. Adım: Minecraft Sunucusunu Yeniden Başlatma
-Sunucunuzun plugin dosyasını okuması ve çalıştırması için Minecraft sunucunuzu yeniden başlatın.
-## Kullanım
-### Oyuncu Eşleme
-1. Minecraft sunucusunda /discord link komutunu çalıştırın.
-2. Discord botu tarafından gönderilen bağlantıya tıklayın ve gerekli izinleri verin.
-3. Eşleme işlemi tamamlandığında, Minecraft sunucusunda başarı mesajını göreceksiniz.
-### Rol Eşleme
-config.yml dosyasında belirlediğiniz roller ile oyuncuların Minecraft ve Discord rollerini eşleyebilirsiniz. Örneğin, roles bölümünde belirttiğiniz rol ID'leri ve izinler, sunucunuzdaki yetki ve izin sistemini senkronize eder.
+### Step 4: Restarting the Minecraft Server
+Restart your Minecraft server to load and run the plugin files.
+## Usage
+### Player Linking
+1. Run the /discord link command on the Minecraft server.
+2. Click the link sent by the Discord bot and grant the necessary permissions.
+3. Once the linking process is complete, you will see a success message on the Minecraft server.
+### Role Linking
+You can link players' Minecraft and Discord roles by specifying the roles in the config.yml file. For example, the role IDs and permissions specified in the roles section will synchronize the authority and permission system on your server.
 
