@@ -89,8 +89,13 @@ Restart your Minecraft server to load and run the plugin files.
 ## Usage
 ### Player Linking
 1. Run the /discord link command on the Minecraft server.
-2. Click the link sent by the Discord bot and grant the necessary permissions.
+2. Click the link sent by the Discord bot and grant the necessary perm
+issions.
 3. Once the linking process is complete, you will see a success message on the Minecraft server.
 ### Role Linking
 You can link players' Minecraft and Discord roles by specifying the roles in the config.yml file. For example, the role IDs and permissions specified in the roles section will synchronize the authority and permission system on your server.
-
+# Images
+![resim1](https://github.com/PnterNN/MCordSync/assets/73419655/d677fdca-2164-472f-a86e-b7cfca72655e)
+![resim2](https://github.com/PnterNN/MCordSync/assets/73419655/71d5b9f3-62cb-4e18-966e-4eeac18b09a1)
+![resim3](https://github.com/PnterNN/MCordSync/assets/73419655/90d886d8-7507-458f-ac7f-601a81b72f9f)
+![resim4](https://github.com/PnterNN/MCordSync/assets/73419655/877a3f6f-16db-40ad-a81a-ca02c2e5f014)
