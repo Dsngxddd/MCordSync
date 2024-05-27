@@ -22,25 +22,16 @@ public class DiscordLinkCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         MiniMessage mm = MiniMessage.miniMessage();
-        if(args[0].equalsIgnoreCase("report")){
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
-            OfflinePlayer reporter = Bukkit.getOfflinePlayer("PnterNN");
-            OfflinePlayer reported = Bukkit.getOfflinePlayer("PnterNN");
-            DiscordReportManager.createReport(reporter.getUniqueId(), reported.getUniqueId(), "test", LocalDateTime.now().format(formatter), "pending", true);
-            if(reporter.isOnline()){
-                ((net.kyori.adventure.audience.Audience) reporter.getPlayer()).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.reporterPlayerMessage"), Placeholder.styling("link", ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "http://" + ConfigurationHandler.getValue("bot.host") + ":" + ConfigurationHandler.getValue("bot.port") + "/report/" + DiscordReportManager.getLastReportID()))));
-            }
-            if(reported.isOnline()){
-                ((net.kyori.adventure.audience.Audience) reported.getPlayer()).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.reportedPlayerMessage"), Placeholder.styling("link", ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "http://" + ConfigurationHandler.getValue("bot.host") + ":" + ConfigurationHandler.getValue("bot.port") + "/report/" + DiscordReportManager.getLastReportID()))));
-            }
-        }else if(args[0].equalsIgnoreCase("mute")){
-            OfflinePlayer player = Bukkit.getOfflinePlayer("PnterNN");
-            MCordSync.getPlayerManager().mutePlayer(player.getUniqueId(), LocalDateTime.now().plusMinutes(1));
-        }
         if(sender instanceof Player){
             Player player = (Player) sender;
             if (player.hasPermission("mcordsync.player")) {
-                if (args[0].equalsIgnoreCase("link")) {
+                if(args.length == 0){
+                    player.sendMessage("");
+                    player.sendMessage("§cDoğru kullanım: /discord-esle <bağla/kaldır>");
+                    player.sendMessage("");
+                    return true;
+                }
+                if (args[0].equalsIgnoreCase("bagla")|| args[0].equalsIgnoreCase("bağla")) {
                     if (DiscordUserManager.getUserData(player.getUniqueId()) != null) {
                         player.sendMessage("");
                         ((net.kyori.adventure.audience.Audience) player).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.alreadySynced")));
@@ -52,25 +43,29 @@ public class DiscordLinkCommand implements CommandExecutor {
                         player.sendMessage("");
                     }
                 }
-                if (args[0].equalsIgnoreCase("unlink")) {
+                if (args[0].equalsIgnoreCase("kaldir") || args[0].equalsIgnoreCase("kaldır")) {
                     if (DiscordUserManager.getUserData(player.getUniqueId()) == null) {
                         player.sendMessage("");
                         ((net.kyori.adventure.audience.Audience) player).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.alreadyUnsynced")));
                         player.sendMessage("");
                     } else {
+
                         DiscordUserManager.takeDiscordRoles(DiscordUserManager.getDiscordID(player.getUniqueId()));
+
                         DiscordUserManager.removeUserData(player.getUniqueId());
+
                         MCordSync.getInstance().getMySQL().deleteUser(player.getUniqueId().toString());
+
                         player.sendMessage("");
                         ((net.kyori.adventure.audience.Audience) player).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.successfullyUnsync")));
                         player.sendMessage("");
                     }
                 }
+                return true;
             } else {
                 player.sendMessage("");
                 ((net.kyori.adventure.audience.Audience) player).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.noPermission")));
                 player.sendMessage("");
-
             }
             return true;
         }else{

@@ -1,15 +1,13 @@
-package com.pnternn.mcordsync.SQL;
+package com.pnternn.mcordsync.Services;
 
 import com.pnternn.mcordsync.Models.DiscordReportData;
 import com.pnternn.mcordsync.Models.DiscordUserData;
 import com.pnternn.mcordsync.Config.ConfigurationHandler;
 import com.pnternn.mcordsync.Models.PlayerData;
 import org.bukkit.Bukkit;
-import org.bukkit.material.Tree;
 
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class MySQL {
@@ -24,6 +22,7 @@ public class MySQL {
         }
     }
     public void createTable()  {
+        if(ConfigurationHandler.getValue("mysql.enabled").equals("false")) return;
         try {
             Statement statement = connection.createStatement();
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS "+ ConfigurationHandler.getValue("mysql.table") +" (uuid VARCHAR(255), discordID VARCHAR(255), username VARCHAR(255), avatar VARCHAR(255))");
@@ -35,6 +34,7 @@ public class MySQL {
         }
     }
     public void createPlayer(UUID uuid){
+        if(ConfigurationHandler.getValue("mysql.enabled").equals("false")) return;
         try {
             Statement statement = connection.createStatement();
             statement.executeUpdate("INSERT INTO "+ ConfigurationHandler.getValue("mysql.table") + "_players" +" (uuid, warns, muteExpire) VALUES ('" + uuid + "', '0', '0')");
@@ -45,6 +45,7 @@ public class MySQL {
     }
 
     public void createReport(DiscordReportData reportData){
+        if(ConfigurationHandler.getValue("mysql.enabled").equals("false")) return;
         try {
             TreeMap<LocalDateTime, String> messages = reportData.getMessages();
             StringBuilder messageString = new StringBuilder();
@@ -60,6 +61,7 @@ public class MySQL {
     }
 
     public void createUser(DiscordUserData userData){
+        if(ConfigurationHandler.getValue("mysql.enabled").equals("false")) return;
         try {
             Statement statement = connection.createStatement();
             statement.executeUpdate("INSERT INTO "+ ConfigurationHandler.getValue("mysql.table") +" (uuid, discordID, username, avatar) VALUES ('" + userData.getUUID() + "', '" + userData.getDiscordID() + "', '" + userData.getUsername() + "', '" + userData.getAvatar() + "')");
@@ -69,6 +71,7 @@ public class MySQL {
         }
     }
     public void deleteReport(int reportID) {
+        if(ConfigurationHandler.getValue("mysql.enabled").equals("false")) return;
         try {
             Statement statement = connection.createStatement();
             statement.executeUpdate("DELETE FROM "+ ConfigurationHandler.getValue("mysql.table") + "_reports" +" WHERE reportID='" + reportID + "'");
@@ -78,6 +81,7 @@ public class MySQL {
         }
     }
     public void deleteUser(String uuid) {
+        if(ConfigurationHandler.getValue("mysql.enabled").equals("false")) return;
         try {
             Statement statement = connection.createStatement();
             statement.executeUpdate("DELETE FROM "+ ConfigurationHandler.getValue("mysql.table")+" WHERE uuid='" + uuid + "'");
@@ -88,6 +92,7 @@ public class MySQL {
     }
     public List<DiscordUserData> getUsers() {
         List<DiscordUserData> users = new ArrayList<>();
+        if(ConfigurationHandler.getValue("mysql.enabled").equals("false")) return users;
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM "+ ConfigurationHandler.getValue("mysql.table"));
@@ -101,6 +106,7 @@ public class MySQL {
         return users;
     }
     public void mutePlayer(UUID uuid, LocalDateTime time){
+        if(ConfigurationHandler.getValue("mysql.enabled").equals("false")) return;
         try {
             Statement statement = connection.createStatement();
             if(time == null){
@@ -115,6 +121,7 @@ public class MySQL {
     }
     public List<PlayerData> getPlayers(){
         List<PlayerData> players = new ArrayList<>();
+        if(ConfigurationHandler.getValue("mysql.enabled").equals("false")) return players;
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM "+ ConfigurationHandler.getValue("mysql.table") + "_players");
@@ -134,6 +141,7 @@ public class MySQL {
 
     public List<DiscordReportData> getReports(){
         List<DiscordReportData> reports = new ArrayList<>();
+        if(ConfigurationHandler.getValue("mysql.enabled").equals("false")) return reports;
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM "+ ConfigurationHandler.getValue("mysql.table") + "_reports");
@@ -156,6 +164,7 @@ public class MySQL {
     }
 
     public void setStateReport(int reportID, String status) {
+        if(ConfigurationHandler.getValue("mysql.enabled").equals("false")) return;
         try {
             Statement statement = connection.createStatement();
             statement.executeUpdate("UPDATE "+ ConfigurationHandler.getValue("mysql.table") + "_reports" +" SET status='"+ status+"' WHERE reportID='" + reportID + "'");

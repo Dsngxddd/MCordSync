@@ -50,6 +50,7 @@ public class PlayerManager {
         return 0.0;
     }
     public static TreeMap<LocalDateTime, String> getPlayerMessages(UUID uuid){
+
         for(PlayerData p:players)
         {
             if(p.getUUID().equals(uuid))

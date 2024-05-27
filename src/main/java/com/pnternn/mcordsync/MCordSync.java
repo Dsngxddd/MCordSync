@@ -9,7 +9,8 @@ import com.pnternn.mcordsync.Managers.DiscordReportManager;
 import com.pnternn.mcordsync.Managers.PlayerManager;
 import com.pnternn.mcordsync.Models.DiscordUserData;
 import com.pnternn.mcordsync.Config.ConfigurationHandler;
-import com.pnternn.mcordsync.SQL.MySQL;
+import com.pnternn.mcordsync.Services.MySQL;
+import com.pnternn.mcordsync.Services.Redis;
 import com.sun.net.httpserver.HttpServer;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -24,13 +25,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public final class MCordSync extends JavaPlugin {
     private static MCordSync instance;
     private MySQL mySql;
+    private Redis redis;
     private static JDA jda;
     private static PlayerManager playerManager;
     private static DiscordReportManager reportManager;
@@ -38,19 +39,27 @@ public final class MCordSync extends JavaPlugin {
     HttpServer server;
     @Override
     public void onEnable() {
+
         instance = this;
         configurationHandler.init();
-
         setupServer();
-        setupMySQL();
-        setupDiscordBot();
+
+        if(ConfigurationHandler.getValue("mysql.enabled").equals("true")){
+            setupMySQL();
+        }
+        if(ConfigurationHandler.getValue("redis.enabled").equals("true")){
+            setupRedis();
+        }
+        if(ConfigurationHandler.getValue("bot.enabled").equals("true")){
+            setupDiscordBot();
+        }
 
         playerManager = new PlayerManager();
         this.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
         reportManager = new DiscordReportManager();
 
-        this.getCommand("discord").setExecutor(new DiscordLinkCommand());
+        this.getCommand("discord-esle").setExecutor(new DiscordLinkCommand());
     }
     private void setupDiscordBot(){
         jda = JDABuilder.createDefault(ConfigurationHandler.getValue("bot.token"))
@@ -67,8 +76,14 @@ public final class MCordSync extends JavaPlugin {
             Bukkit.getLogger().severe("Discord bot could not start");
         }
         jda.addEventListener(new DiscordBotListener());
+
     }
 
+    private void setupRedis(){
+        String host = ConfigurationHandler.getValue("redis.host");
+        int port = Integer.parseInt(ConfigurationHandler.getValue("redis.port"));
+        redis = new Redis(host, port);
+    }
     private void setupMySQL(){
         String host = ConfigurationHandler.getValue("mysql.host");
         String port = ConfigurationHandler.getValue("mysql.port");
@@ -83,7 +98,7 @@ public final class MCordSync extends JavaPlugin {
     }
     private void setupServer(){
         ExecutorService excutor;
-        InetSocketAddress addr = new InetSocketAddress(800);
+        InetSocketAddress addr = new InetSocketAddress(Integer.parseInt(ConfigurationHandler.getValue("bot.port")));
         try {
             server = HttpServer.create(addr, 0);
         } catch (IOException e) {
@@ -98,7 +113,10 @@ public final class MCordSync extends JavaPlugin {
     @Override
     public void onDisable() {
         server.stop(0);
-        jda.shutdownNow();
+        if(jda != null){
+            jda.shutdownNow();
+        }
+        redis.close();
     }
     public static MCordSync getInstance(){
         return instance;
@@ -108,6 +126,10 @@ public final class MCordSync extends JavaPlugin {
     }
     public MySQL getMySQL(){
         return mySql;
+    }
+    public Redis getRedis() {
+        return
+                redis;
     }
     public static PlayerManager getPlayerManager(){
         return playerManager;

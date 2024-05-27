@@ -20,10 +20,15 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.event.EventBus;
+import net.luckperms.api.event.EventSubscription;
+import net.luckperms.api.event.LuckPermsEvent;
 import net.luckperms.api.event.node.NodeAddEvent;
+import net.luckperms.api.event.node.NodeMutateEvent;
 import net.luckperms.api.event.node.NodeRemoveEvent;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
+import net.luckperms.api.node.NodeType;
+import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -34,59 +39,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.prefs.NodeChangeEvent;
+import java.util.stream.Collectors;
 
 public class DiscordBotListener extends ListenerAdapter{
 
     public DiscordBotListener() {
-        LuckPerms luckPerms = LuckPermsProvider.get();
-        EventBus eventBus = luckPerms.getEventBus();
-        eventBus.subscribe(MCordSync.getInstance(), NodeRemoveEvent.class, this::onNodeRemoveEvent);
-        eventBus.subscribe(MCordSync.getInstance(), NodeAddEvent.class, this::onNodeAddEvent);
-    }
-    private void onNodeAddEvent(NodeAddEvent event){
-        if (!event.isUser()) {
-            return;
-        }
-        User target = (User) event.getTarget();
-        Node node = event.getNode();
 
-        MCordSync.getInstance().getServer().getScheduler().runTask(MCordSync.getInstance(), () -> {
-            DiscordUserData userData = DiscordUserManager.getUserData(target.getUniqueId());
-            if(userData == null){
-                return;
-            }
-            if (node instanceof PermissionNode) {
-                for (String key : ConfigurationHandler.getKeys("roles")) {
-                    if (node.getKey().equals(ConfigurationHandler.getValue("roles." + key + ".permission"))) {
-                        DiscordUserManager.giveDiscordRole(userData.getDiscordID(), ConfigurationHandler.getValue("roles." + key + ".id"));
-                    }
-                }
-            }
-        });
     }
-    private void onNodeRemoveEvent(NodeRemoveEvent event){
-        if (!event.isUser()) {
-            return;
-        }
-        User target = (User) event.getTarget();
-        Node node = event.getNode();
-
-        MCordSync.getInstance().getServer().getScheduler().runTask(MCordSync.getInstance(), () -> {
-            DiscordUserData userData = DiscordUserManager.getUserData(target.getUniqueId());
-            if(userData == null){
-                return;
-            }
-            if (node instanceof PermissionNode) {
-                for (String key : ConfigurationHandler.getKeys("roles")) {
-                    if (node.getKey().equals(ConfigurationHandler.getValue("roles." + key + ".permission"))) {
-                        DiscordUserManager.takeDiscordRole(userData.getDiscordID(), ConfigurationHandler.getValue("roles." + key + ".id"));
-                    }
-                }
-            }
-        });
-    }
-
     @Override
     public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
         if(event.getGuild().getId().equals(ConfigurationHandler.getValue("guild.id"))){

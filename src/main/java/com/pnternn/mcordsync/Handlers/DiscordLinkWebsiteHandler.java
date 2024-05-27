@@ -102,7 +102,9 @@ public class DiscordLinkWebsiteHandler implements HttpHandler{
                 DiscordUserManager.addUserData(new DiscordUserData(DiscordUserManager.getUUID(code), discordID, username, avatar), true);
                 MiniMessage mm = MiniMessage.miniMessage();
                 ((net.kyori.adventure.audience.Audience) Bukkit.getPlayer(DiscordUserManager.getUUID(code))).sendMessage(mm.deserialize(ConfigurationHandler.getValue("messages.successfullySync"), Placeholder.parsed("username", username)));
+
                 DiscordUserManager.giveDiscordRoles(discordID);
+
             }else if(state.equals("retrieve_discord_account")){
                 if(DiscordUserManager.getUUID(code) != null){
                     UUID playerUUID = DiscordUserManager.getUUID(code);

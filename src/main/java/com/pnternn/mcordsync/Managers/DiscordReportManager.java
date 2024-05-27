@@ -39,7 +39,9 @@ public class DiscordReportManager {
         buttons.add(Button.danger("report_"+ lastreportID +"_mute", "Oyuncuyu Sustur"));
         MCordSync.getJDA().getGuildById(ConfigurationHandler.getValue("guild.id")).getTextChannelById(ConfigurationHandler.getValue("guild.reportChannelID")).sendMessageEmbeds(eb.build()).addActionRow(buttons).queue();
         if(saveMysql){
+
             MCordSync.getInstance().getMySQL().createReport(report);
+
         }
     }
     public static void closeReport(Integer reportID){
