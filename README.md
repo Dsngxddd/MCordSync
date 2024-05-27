@@ -33,50 +33,56 @@ config.yml dosyasını açın ve aşağıdaki gibi yapılandırın:
 
 ```yaml
 bot:
-  enabled: true
-  id: "BOT_ID"
+  enabled: true #Only main server should have this enabled
+  id: "CLIENT_ID"
   token: "BOT_TOKEN"
-  secret: "BOT_SECRET"
+  secret: "CLIENT_SECRET"
   host: "127.0.0.1"
-  port: 800
-  
+  port: 80
+
 guild:
   id: "GUILD_ID"
   reportChannelID: "CHANNEL_ID"
-  staffRoleID: "STAFF_ROLE_ID"
+  staffRoleID: "ROLE_ID"
 
 roles:
   0:
-    id: "DISCORD_ROLE_ID"
+    id: "ROLE_ID"
     permission: "mcordsync.role.0"
 
 redis:
-  enabled: true
-  host: "127.0.0.1"
+  enabled: true # if your server is a network, you should enable this
+  host: ""
   port: 6379
   channel: "mcordsync"
-  password: "PASSWORD"
-
+  password: ""
 mysql:
   enabled: true
   host: "127.0.0.1"
   port: 3306
-  database: "DATABASE"
+  database: "DatabaseName"
   table: "mcordsync"
-  username: 'USERNAME'
-  password: 'PASSWORD'
+  username: "root"
+  password: "password"
 
-messages:
-  playerMuted: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Susturuldunuz, susturma bitimine kalan süre: <color:#5764F1><time>"
-  noPermission: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#DD5746>Bu komutu çalıştırma izniniz yok."
-  noConsole: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#DD5746>Bu komut yalnızca oyuncular tarafından çalıştırılabilir."
-  successfullySync: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Discord hesabınız başarıyla bağlandı, kullanıcı adınız: <color:#5764F1><username>"
-  successfullyUnsync: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Bağlantı başarıyla kaldırıldı"
-  alreadySynced: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Hesabınız zaten bağlı! Bağlantıyı kaldırmak için, <color:#5764F1><click:run_command:/discord unlink>buraya tıklayın</click>"
-  alreadyUnsynced: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Hesabınız bağlı değil! Hesabınızı bağlamak için, <color:#5764F1><click:run_command:/discord link>buraya tıklayın</click>"
-  syncMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Discord hesabınızı bağlamak için, <color:#5764F1><link>buraya tıklayın"
-  reporterPlayerMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Başarıyla raporlandı, rapora bakmak için <color:#5764F1><link>tıklayın"
-  reportedPlayerMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Bir oyuncu sizi raporladı, raporun detaylarına bakmak için <color:#5764F1><link>tıklayın"
+sqlite: #Work In Progress
+  enabled: false
+  database: "DatabaseName"
+  table: "mcordsync"
+
+
+messages: #FORMATS https://docs.advntr.dev/minimessage/format.html
+  playerMuted: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Sen susturuldun, susturulma bitmesine kalan süre: <color:#5764F1><time>"
+  noPermission: "<color:#DD5746>You do not have permission to execute this command."
+  noConsole: "<color:#DD5746>This command can only be executed by players."
+  successfullySync: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Discord hesabınız bağlandı isminiz: <color:#5764F1><username>"
+  successfullyUnsync: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>link removed successfully"
+  alreadySynced: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Hesabın bağlı! Bağlantıyı kaldırmak için <color:#5764F1><click:run_command:/discord-esle kaldir>tıkla"
+  alreadyUnsynced: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Hesabın bağlı değil! Bağlamak için <color:#5764F1><click:run_command:/discord-esle bagla>tıkla"
+  syncMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Discord hesabınızı bağlamak için <color:#5764F1><link>tıkla"
+  reporterPlayerMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Başarıyla raporlandı, rapora bakmak için <color:#5764F1><link>tıkla"
+  reportedPlayerMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Bir oyuncu seni raporladı, raporun detayları için <color:#5764F1><link>tıkla"
+  reportChangeStatusMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Raporun durumu değiştirildi, raporun detayları için <color:#5764F1><link>tıkla"
 ```
 ### 4. Adım: Minecraft Sunucusunu Yeniden Başlatma
 Sunucunuzun plugin dosyasını okuması ve çalıştırması için Minecraft sunucunuzu yeniden başlatın.
