@@ -1,7 +1,12 @@
 name: MCordSync
 version: '${project.version}'
 main: com.pnternn.mcordsync.MCordSync
-api-version: '1.20'
+api-version: '1.19'
 commands:
-  discord-esle:
+  mcordsync:
     description: Link your Discord account to your Minecraft account
+  report:
+    description: report
+  mcordsync-admin:
+    description: Admin P0wer
+    permission: op

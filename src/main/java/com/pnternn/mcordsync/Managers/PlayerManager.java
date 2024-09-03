@@ -15,10 +15,13 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class PlayerManager {
+    private InetAddress player;
+
     private static final List<PlayerData> players = new ArrayList<>();
 
     public PlayerManager() {
@@ -74,14 +77,23 @@ public class PlayerManager {
         }
 
     }
-    public static PlayerData getPlayer(UUID uuid){
-        for(PlayerData p:players)
-        {
-            if(p.getUUID().equals(uuid))
-            {
+    public static PlayerData getPlayer(UUID uuid) {
+        for (PlayerData p : players) {
+            if (p.getUUID().equals(uuid)) {
                 return p;
             }
         }
         return null;
     }
+
+    public static String getPlayerIPAddress(UUID uuid) {
+        for (PlayerData p : players) {
+            if (p.getUUID().equals(uuid)) {
+                return p.getIPAddress();
+            }
+        }
+        return null;
+    }
+
+
 }

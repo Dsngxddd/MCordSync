@@ -1,6 +1,5 @@
 package com.pnternn.mcordsync.Managers;
 
-import com.google.gson.JsonObject;
 import com.pnternn.mcordsync.MCordSync;
 import com.pnternn.mcordsync.Models.DiscordUserData;
 import com.pnternn.mcordsync.Config.ConfigurationHandler;
@@ -13,7 +12,6 @@ import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeType;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.bukkit.Bukkit;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -65,6 +63,7 @@ public class DiscordUserManager {
             user.put("username", data.getUsername());
             user.put("avatar", data.getAvatar());
             MCordSync.getInstance().getRedis().publish(ConfigurationHandler.getValue("redis.channel"), user);
+
         }
     }
 
@@ -204,5 +203,6 @@ public class DiscordUserManager {
         user.put("type", "REMOVE_USER");
         user.put("uuid", uuid.toString());
         MCordSync.getInstance().getRedis().publish(ConfigurationHandler.getValue("redis.channel"), user);
+
     }
 }

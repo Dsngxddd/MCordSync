@@ -4,24 +4,32 @@ import java.util.UUID;
 
 public class DiscordUserData {
     private UUID uuid;
-    private String DiscordID;
-    private String Username;
+    private String ipAddress;
+    private String discordID;
+    private String username;
     private String avatar;
-    public DiscordUserData(UUID uuid, String DiscordID, String Username, String avatar) {
+
+    public DiscordUserData(UUID uuid,String discordID, String username, String avatar) {
         this.uuid = uuid;
-        this.DiscordID = DiscordID;
-        this.Username = Username;
+        this.discordID = discordID;
+        this.username = username;
         this.avatar = avatar;
     }
+
     public UUID getUUID() {
         return uuid;
     }
+
+
+
     public String getDiscordID() {
-        return DiscordID;
+        return discordID;
     }
+
     public String getUsername() {
-        return Username;
+        return username;
     }
+
     public String getAvatar() {
         return avatar;
     }

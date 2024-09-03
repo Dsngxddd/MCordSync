@@ -154,7 +154,7 @@ public class MySQL {
                         messageMap.put(LocalDateTime.parse(messageData[0]), messageData[1]);
                     }
                 }
-                reports.add(new DiscordReportData(resultSet.getInt("reportID"), UUID.fromString(resultSet.getString("reporterUUID")), UUID.fromString(resultSet.getString("reportedUUID")), resultSet.getString("reason"), resultSet.getString("date"), resultSet.getString("status"), resultSet.getString("server"), messageMap, resultSet.getDouble("cps")));
+                reports.add(new DiscordReportData(resultSet.getInt("reportID"), UUID.fromString(resultSet.getString("reporterUUID")), UUID.fromString(resultSet.getString("reportedUUID")), resultSet.getString("reason"), resultSet.getString("date"), resultSet.getString("status"), messageMap, resultSet.getDouble("cps")));
             }
             statement.close();
         } catch (SQLException e) {

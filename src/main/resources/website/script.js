@@ -22,20 +22,20 @@ const post = async(uri = `${window.location.protocol}//${window.location.hostnam
     try {
         // Send the request
         const response = await fetch(uri, {
-        "headers": {
-            "Content-Type": contentType,
-            "Authorization": authorization
-        },
-        "body": JSON.stringify(body),
-        "method": method,
-        "cache": cache
+            "headers": {
+                "Content-Type": contentType,
+                "Authorization": authorization
+            },
+            "body": JSON.stringify(body),
+            "method": method,
+            "cache": cache
         });
-        
+
         // Check the response status
         if (!response.ok) {
             throw new Error(response.statusText);
         }
-        
+
         // Return the response data
         const data = await response.json();
         return data;
@@ -85,9 +85,9 @@ document.body.append( message );
     // They did, retrieve their uuid
     post(host, { get: "uuid", code: code }).then( response => {
         const uuid = response.uuid;
-        // Check if the uuid we got is correct, if not tell the user to use the /link command again
+        // Check if the uuid we got is correct, if not tell the user to use the /discord link command again
         if( uuid == void 0 ) {
-            message.innerHTML = 'Oturum süresi doldu, lütfen <font text="Oyun içinden yazmayı unutma 🥺" color="#5865F2">/link</font> komutunu tekrar kullanın!';
+            message.innerHTML = 'Oturum süresi doldu, lütfen <font text="Oyun içerisinden yazmayı unutma 🥺" color="#5865F2">/discord link</font> komutunu tekrar kullanın!';
             return;
         }
 
@@ -116,22 +116,22 @@ document.body.append( message );
 (() => {
     // Check if someone came here after their authorization with Discord
     if( !queries.state && !queries.id ) {
-        message.innerHTML = 'lütfen <font text="Oyun içinden yazmayı unutma 🥺" color="#5865F2">/link</font> komutunu kullanın!';
+        message.innerHTML = 'lütfen <font text="Oyun içerisinden yazmayı unutma 🥺" color="#5865F2">/discord link</font> komutunu kullanın!';
         return;
     };
-    
+
     const [uuid, code] = [queries.state?.slice(0, -16), queries.state?.slice(-16)];
     if( uuid == null || code == null ) {
         // Someone either opened up the url without any queries, wrote them themselves, or took too long to authenticate (5 minutes by default)
-        message.innerHTML = 'lütfen <font text="Oyun içinden yazmayı unutma 🥺" color="#5865F2">/link</font> komutunu kullanın!';
+        message.innerHTML = 'lütfen <font text="Oyun içerisinden yazmayı unutma 🥺" color="#5865F2">/discord link</font> komutunu kullanın!';
         return;
     };
 
     // Check if the provided uuid and code are correct
     post(host, { get: "uuid", code: code }).then( response => {
-        // If they weren't, tell the user to use the /link command again
+        // If they weren't, tell the user to use the /discord link command again
         if( response.uuid == null ) {
-            message.innerHTML = 'Oturum süresi doldu, lütfen <font text="Oyun içinden yazmayı unutma 🥺" color="#5865F2">/link</font> komutunu tekrar kullanın!';
+            message.innerHTML = 'Oturum süresi doldu, lütfen <font text="Oyun içerisinden yazmayı unutma 🥺" color="#5865F2">/discord link</font> komutunu tekrar kullanın!';
             return;
         }
 
@@ -141,39 +141,39 @@ document.body.append( message );
         // Tell the server to retrieve the user's discord account with the code Discord gave us
         post(host, { get: "discord_account", code: code, access_code: access_code }).then(async response => {
             if( response.success == false ) {
-                message.innerHTML = 'Oturum süresi doldu, lütfen <font text="Oyun içinden yazmayı unutma 🥺" color="#5865F2">/link</font> komutunu tekrar kullanın!';
+                message.innerHTML = 'Oturum süresi doldu, lütfen <font text="Oyun içerisinden yazmayı unutma 🥺" color="#5865F2">/discord link</font> komutunu tekrar kullanın!';
                 return;
             }
             // As the work the server does is ansynchronous (reqn) it can't send us a response in time.
             // Because of that we have to wait, but 3 seconds should be enough. 😢 (should be done recursively but cba)
-            message.innerHTML = '<span waiting>Veriler alınıyor...</span>';
+            message.innerHTML = '<span waiting>Veriler alınıyor</span>';
             await wait(3);
             post(host, { get: "retrieve_discord_account", code: code }).then( response => {
                 if( response.success == false ) {
                     message.innerHTML = `<font error color="#F04747"></font>`;
                     return;
                 }
-                
-                // Everything's by now is done, so just display everything nicely 
+
+                // Everything's by now is done, so just display everything nicely
                 const minecraft = document.createElement('div');
                 minecraft.classList.add('minecraft');
                 const minecraft_avatar = document.createElement('img');
-                minecraft_avatar.src = `https://mc-heads.net/avatar/${uuid}/128`
+                minecraft_avatar.src = `https://mineskin.eu/avatar/${response.name}/128`
                 minecraft.setAttribute('name', response.name);
                 minecraft.append( minecraft_avatar );
-                
+
                 const discord = document.createElement('div');
                 discord.classList.add('discord');
                 const discord_avatar = document.createElement('img');
                 discord_avatar.src = `https://cdn.discordapp.com/avatars/${response.id}/${response.avatar}?size=128`;
-                discord.setAttribute('name', response.username + '#' + response.discriminator);
+                discord.setAttribute('name', response.username);
                 discord.append( discord_avatar );
-                
+
                 const separator = document.createElement('div');
                 separator.classList.add('separator');
 
                 message.innerHTML = 'Artık bu sayfayı kapatabilirsiniz!';
-                
+
                 const text = document.createElement('p');
                 text.classList.add('success');
                 text.innerText = "Başarıyla hesabın bağlandı!";

@@ -4,6 +4,9 @@ import com.pnternn.mcordsync.MCordSync;
 import com.pnternn.mcordsync.Managers.DiscordReportManager;
 import com.pnternn.mcordsync.Managers.DiscordUserManager;
 import com.pnternn.mcordsync.Config.ConfigurationHandler;
+import jdk.javadoc.doclet.Reporter;
+import me.clip.placeholderapi.libs.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -27,7 +30,7 @@ public class DiscordLinkCommand implements CommandExecutor {
             if (player.hasPermission("mcordsync.player")) {
                 if(args.length == 0){
                     player.sendMessage("");
-                    player.sendMessage("§cDoğru kullanım: /discord-esle <bağla/kaldır>");
+                    player.sendMessage("§cDoğru kullanım: /mcordsync <bağla/kaldır>");
                     player.sendMessage("");
                     return true;
                 }

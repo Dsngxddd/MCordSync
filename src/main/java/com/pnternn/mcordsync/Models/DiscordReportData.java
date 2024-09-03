@@ -1,11 +1,8 @@
 package com.pnternn.mcordsync.Models;
 
 import com.pnternn.mcordsync.MCordSync;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -19,7 +16,7 @@ public class DiscordReportData {
     private String server;
     private TreeMap<LocalDateTime, String> messages;
     private Double cps;
-    public DiscordReportData(int reportID, UUID reporterUUID, UUID reportedUUID, String reason, String date, String status, String server, TreeMap<LocalDateTime, String> messages, Double cps) {
+    public DiscordReportData(int reportID, UUID reporterUUID, UUID reportedUUID, String reason, String date, String status, TreeMap<LocalDateTime, String> messages, Double cps) {
         this.reportID = reportID;
         this.reporterUUID = reporterUUID;
         this.reportedUUID = reportedUUID;
@@ -30,6 +27,10 @@ public class DiscordReportData {
         this.messages = messages;
         this.cps = cps;
     }
+
+    public DiscordReportData(int reportID, UUID reporterUUID, UUID reportedUUID, String reason, String date, String status) {
+    }
+
     public int getReportID() {
         return reportID;
     }
