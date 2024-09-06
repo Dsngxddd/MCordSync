@@ -32,57 +32,118 @@ Follow the steps below to set up the system:
 Open the config.yml file and configure it as follows:
 
 ```yaml
+
+
 bot:
-  enabled: true #Only the main server should have this enabled
+  enabled: true # eğer cross Server ise sunucunuz sadece spawn da aktif olsun
   id: "CLIENT_ID"
-  token: "BOT_TOKEN"
-  secret: "CLIENT_SECRET"
-  host: "127.0.0.1"
+  token: "TOKEN"
+  secret: "SECRET_ID"
+  host: "sync.batukubi.com"
   port: 80
+  status: "https://batukubi.com"
 
 guild:
   id: "GUILD_ID"
-  reportChannelID: "CHANNEL_ID"
-  staffRoleID: "ROLE_ID"
+  reportChannelID: "REPORT_CHANNEL"
+  staffRoleID: "STAFF_ROLE"
 
 roles:
   0:
-    id: "ROLE_ID"
-    permission: "mcordsync.role.0"
+    id: "Discord_role_id"
+    permission: "group.elitevip"
+
 
 redis:
-  enabled: true # if your server is a network, you should enable this
-  host: ""
+  enabled: false # Network Üzerinde çalıştırıyorsanız kullanın
+  host: "127.0.0.1"
   port: 6379
-  channel: "mcordsync"
-  password: ""
+  channel: "batukubi"
+  password: "PASS"
 
 mysql:
   enabled: true
-  host: "127.0.0.1"
+  host: "localhost"
   port: 3306
-  database: "DatabaseName"
-  table: "mcordsync"
-  username: "root"
-  password: "password"
+  database: "database"
+  table: "batukubi"
+  username: "user"
+  password: "pass"
 
-sqlite: #Work In Progress
+sqlite: # TEST AŞAMASINDA KULLANMAYIN!
   enabled: false
-  database: "DatabaseName"
-  table: "mcordsync"
+  table: batukubi
 
-messages: #FORMATS https://docs.advntr.dev/minimessage/format.html
-  playerMuted: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>You have been muted, remaining mute time: <color:#5764F1><time>"
-  noPermission: "<color:#DD5746>You do not have permission to execute this command."
-  noConsole: "<color:#DD5746>This command can only be executed by players."
-  successfullySync: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Your Discord account has been linked, username: <color:#5764F1><username>"
-  successfullyUnsync: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Link removed successfully"
-  alreadySynced: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Your account is already linked! To unlink, click <color:#5764F1><click:run_command:/discord-unlink>here</click>"
-  alreadyUnsynced: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Your account is not linked! To link, click <color:#5764F1><click:run_command:/discord-link>here</click>"
-  syncMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>To link your Discord account, click <color:#5764F1><link>here"
-  reporterPlayerMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>Reported successfully, click <color:#5764F1><link>here to view the report"
-  reportedPlayerMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>You have been reported by a player, click <color:#5764F1><link>here to view the details"
-  reportChangeStatusMessage: "<color:#ACE2E1>PirateSkyblock <color:#008DDA>» <color:#F7EEDD>The status of your report has been changed, click <color:#5764F1><link>here to view the details"
+commands:
+  giveReward: "give %player% diamond 1"
+  banPlayer: "ban %player% &eSelam Dostum %reporter% &e Adlı Kişi seni %reason% Sebebiyle reportladı ve Yetkililer bunu doğruladı Bu yüzden sunucudan yasaklandın eğer yanlış bir şey olduğunu düşünüyorsan discorddan talep açabilirsin"
+  mutePlayer: "mute %player%"
+  tempMutePlayer: "tempmute %player% 15m &eSelam Dostum %reporter% &e Adlı Kişi seni %reason% Sebebiyle reportladı ve Yetkililer bunu doğruladı Bu yüzden sunucudan mute yedin eğer yanlış bir şey olduğunu düşünüyorsan discorddan talep açabilirsin"
+
+
+messages:
+  playerMuted: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#F7EEDD>Susturuldunuz, susturma bitimine kalan süre: <color:#5764F1><time>"
+  noPermission: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#DD5746>Bu komutu çalıştırma izniniz yok."
+  noConsole: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#DD5746>Bu komut yalnızca oyuncular tarafından çalıştırılabilir."
+  successfullySync: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#F7EEDD>Discord hesabınız başarıyla bağlandı, kullanıcı adınız: <color:#5764F1><username>"
+  successfullyUnsync: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#F7EEDD>Bağlantı başarıyla kaldırıldı"
+  alreadySynced: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#F7EEDD>Hesabınız zaten bağlı! Bağlantıyı kaldırmak için, <color:#5764F1><click:run_command:/mcordsync kaldir>buraya tıklayın</click>"
+  alreadyUnsynced: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#F7EEDD>Hesabınız bağlı değil! Hesabınızı bağlamak için, <color:#5764F1><click:run_command:/mcordsync bagla>buraya tıklayın</click>"
+  syncMessage: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#F7EEDD>Discord hesabınızı bağlamak için, <color:#5764F1><tikla>"
+  reporterPlayerMessage: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#F7EEDD>Başarıyla raporlandı, rapora bakmak için <color:#5764F1><link>tıklayın"
+  reportedPlayerMessage: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#F7EEDD>Bir oyuncu sizi raporladı, raporun detaylarına bakmak için <color:#5764F1><link>tıklayın"
+  reportusage: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#F7EEDD>Doğru kullanım: /report <oyuncu_ismi> <sebep>"
+  reportcreate: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#F7EEDD>Rapor başarıyla oluşturuldu."
+  reportcooldown: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#F7EEDD>Bir rapor göndermek için 30 dakika beklemelisiniz"
+  selfreport: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#F7EEDD>Kendinizi rapor edemezsiniz"
+  reportnotfound: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#F7EEDD>Belirtilen oyuncu bulunamadı."
+  MCordSync-admin-delete: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#F7EEDD>Doğru kullanım: /mcordsync-admin hesapkaldir <oyuncu_ismi>"
+  MCordSync-admin-usage: "<color:#ACE2E1>MCordSync <color:#008DDA>» <color:#F7EEDD>Kullanım: /mcordsync-admin <reload/unsync>"
+  discordbutton:
+    reportClosed: "Rapor kapatıldı"
+    giftGiven: "Oyuncuya hediye verildi"
+    playerBanned: "Oyuncu yasaklandı"
+    playerMuted: "Oyuncu susturuldu"
+    tempMute: "15 dk susturuldu"
+    giftMessageToReporter: "Selam Report ettiğin %reported% Adlı Oyuncu Suçlu Bulundu. Hesabına Oyun için hediyen tanımlandı!"
+    statusClosed: "Kapatıldı"
+    statusGifted: "Hediye Verildi"
+    statusBanned: "Banlandı"
+    statusMuted: "sınırsız Mute"
+    statusTempMuted: "15dk mute"
+    closedDescription: "**Raporu kapatan:** %user%"
+    giftedDescription: "**Hediye Veren:** %user%"
+    bannedDescription: "**Yasaklayan:** %user%"
+    mutedDescription: "**Susturan:** %user%"
+    tempMutedDescription: "**Susturan:** %user%"
+
+
+reportembed:
+  author: "Rapor %reportID% (İndirmek için tıkla)" # ELLEME
+  author_url: "http://%host%:%port%/report/%reportID%" # ELLEME
+  author_icon: "https://cdn.icon-icons.com/icons2/1130/PNG/512/downloadwithcircularbutton_80316.png"
+  content:
+    reporter: "Raporlayan: **%reporterName% (%reporterMention%)**"
+    reporter_no_mention: "Raporlayan: **%reporterName%**"
+    reported: "Raporlanan: **%reportedName% (%reportedMention%)**"
+    reported_no_mention: "Raporlanan: **%reportedName%**"
+    reported_ip: "Raporlanan IP adresi: %reportedIP%"
+    reporter_ip: "Raporlayan IP adresi: %reporterIP%"
+    server: "Sunucu: **%serverName%**"
+    reason: "Sebep: **%reason%**"
+    cps: "Son 20 saniyedeki makro Oranı: **%cps%/Saniye**"
+    last_messages: "**Son %messageCount% Mesajı:**"
+    status: "Durum: **%status%**"
+    date: "Tarih: **%date%**"
+    staff_role: "%staffRoleMention%"
+
+
+reportbutton:
+  reportclose: "Reportu kapat"
+  giftedplayer: "Oyuncuya Hediye Ver"
+  banned: "Oyuncuyu yasakla"
+  muted: "Oyuncuyu sustur"
+  15mmuted: "15 dakika Oyuncuyu Sustur"
 ```
 ### Step 4: Restarting the Minecraft Server
 Restart your Minecraft server to load and run the plugin files.
