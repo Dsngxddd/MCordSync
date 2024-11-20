@@ -1,6 +1,7 @@
 name: MCordSync
 version: '${project.version}'
 main: com.pnternn.mcordsync.MCordSync
+author: cengiz1x, pnternn
 api-version: '1.19'
 commands:
   mcordsync:
