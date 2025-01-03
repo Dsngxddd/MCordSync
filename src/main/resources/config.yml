@@ -7,7 +7,9 @@ bot:
   secret: "SECRET_ID"
   host: "sync.batukubi.com"
   port: 80
-  status: "https://batukubi.com"
+  status:
+    enabled: true
+    text: "https://batukubi.com"
 
 guild:
   id: "GUILD_ID"
