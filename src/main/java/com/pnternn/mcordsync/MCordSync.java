@@ -93,12 +93,18 @@ public final class MCordSync extends JavaPlugin {
 
     private void setupDiscordBot() {
         jda = JDABuilder.createDefault(ConfigurationHandler.getValue("bot.token"))
-                .setActivity(Activity.playing(ConfigurationHandler.getValue("bot.status")))
                 .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .enableCache(CacheFlag.ONLINE_STATUS, CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS)
                 .build();
+        if (ConfigurationHandler.getConfig().getBoolean("bot.status.enabled")) {
+            String statusText = ConfigurationHandler.getValue("bot.status.text");
+            jda.getPresence().setActivity(Activity.playing(statusText));
+        }
+
+
+
 
         try {
             jda.awaitReady();
